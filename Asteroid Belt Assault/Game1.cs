@@ -11,6 +11,17 @@ namespace Asteroid_Belt_Assault
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        AsteroidManager asteroidManager;
+
+        StarField starField;
+
+        enum GameStates { TitleScreen, Playing, PlayerDead, GameOver };
+        GameStates gameState = GameStates.Playing;
+        Texture2D titleScreen;
+        Texture2D spriteSheet;
+        PlayerManager playerManager;
+
+        EnemyManager enemyManager;
 
         public Game1()
         {
@@ -39,7 +50,12 @@ namespace Asteroid_Belt_Assault
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            titleScreen = Content.Load<Texture2D>(@"Textures\TitleScreen");
+            spriteSheet = Content.Load<Texture2D>(@"Textures\spriteSheet");
+            starField = new StarField(this.Window.ClientBounds.Width,this.Window.ClientBounds.Height,200,new Vector2(0, 30f),spriteSheet, new Rectangle(0, 450, 2, 2));
+            asteroidManager = new AsteroidManager(10, spriteSheet, new Rectangle(0, 0, 50, 50), 20, this.Window.ClientBounds.Width, this.Window.ClientBounds.Height);
+            playerManager = new PlayerManager(spriteSheet, new Rectangle(0, 150, 50, 50), 3, new Rectangle(0,0,this.Window.ClientBounds.Width, this.Window.ClientBounds.Height));
+            enemyManager = new EnemyManager(spriteSheet,new Rectangle(0, 200, 50, 50),6,playerManager,new Rectangle(0,0,this.Window.ClientBounds.Width, this.Window.ClientBounds.Height));
             // TODO: use this.Content to load your game content here
         }
 
@@ -63,7 +79,21 @@ namespace Asteroid_Belt_Assault
                 Exit();
 
             // TODO: Add your update logic here
-
+            switch (gameState)
+            {
+                case GameStates.TitleScreen:
+                    break;
+                case GameStates.Playing:
+                    starField.Update(gameTime);
+                    asteroidManager.Update(gameTime);
+                    playerManager.Update(gameTime);
+                    enemyManager.Update(gameTime);
+                    break;
+                case GameStates.PlayerDead:
+                    break;
+                case GameStates.GameOver:
+                    break;
+            }
             base.Update(gameTime);
         }
 
@@ -73,11 +103,31 @@ namespace Asteroid_Belt_Assault
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
             // TODO: Add your drawing code here
-
-            base.Draw(gameTime);
+            spriteBatch.Begin();
+            if (gameState == GameStates.TitleScreen)
+                base.Draw(gameTime);
+            {
+                spriteBatch.Draw(titleScreen,
+                new Rectangle(0, 0, this.Window.ClientBounds.Width,
+                this.Window.ClientBounds.Height),
+                Color.White);
+            }
+            if ((gameState == GameStates.Playing) ||
+            (gameState == GameStates.PlayerDead) ||
+            (gameState == GameStates.GameOver))
+            {
+                starField.Draw(spriteBatch);
+                asteroidManager.Draw(spriteBatch);
+                playerManager.Draw(spriteBatch);
+                enemyManager.Draw(spriteBatch);
+            }
+            if ((gameState == GameStates.GameOver))
+            {
+            }
+            spriteBatch.End();
         }
     }
 }
