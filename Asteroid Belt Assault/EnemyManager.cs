@@ -26,7 +26,7 @@ namespace Asteroid_Belt_Assault
         private List<List<Vector2>> pathWaypoints =
         new List<List<Vector2>>();
         private Dictionary<int, int> waveSpawns = new Dictionary<int, int>();
-        public bool Active = true;
+        public bool Active = false;
         private Random rand = new Random();
 
         private void setUpWaypoints()
